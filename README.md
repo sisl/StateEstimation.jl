@@ -11,9 +11,9 @@ dev https://github.com/mossr/StateEstimation.jl
 Then open Julia, run `using Pluto; Pluto.run()`, and open notebooks in `~/.julia/dev/StateEstimation/src/`.
 
 ### Pluto notebooks
-- [Section overview](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/section_overview.html?token=AAMEYXN7V2R3QZNCXDFEE5C7NGDJC)
-- [Kalman filtering](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/kalman_filter.html?token=AAMEYXPGQTUCRIAIYNX4YM27NGDEG)
-- [Particle filtering](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/particle_filter.html?token=AAMEYXMZUOT4FC4D6KWPEZK7NGDII)
+- [Section overview](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/section_overview.html)
+- [Kalman filtering](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/kalman_filter.html)
+- [Particle filtering](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/particle_filter.html)
 - Exact belief state planning (alpha vectors)
 
 ### Slides
