@@ -6,7 +6,7 @@ Section for AA228/CS238 *Decision Making Under Uncertainty* at Stanford Universi
 Belief state estimation in [Pluto](https://github.com/fonsp/Pluto.jl) notebooks.
 
 ```julia
-dev https://github.com/mossr/StateEstimation.jl
+] dev https://github.com/mossr/StateEstimation.jl
 ```
 Then open Julia, run `using Pluto; Pluto.run()`, and open notebooks in `~/.julia/dev/StateEstimation/src/`.
 
