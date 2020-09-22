@@ -1,0 +1,5 @@
+name = "StateEstimation"
+uuid = "c3f2a76f-0f6c-435d-9fe0-1cd1ac350f64"
+authors = ["Robert Moss <mossr@cs.stanford.edu>"]
+version = "0.1.0"
+
