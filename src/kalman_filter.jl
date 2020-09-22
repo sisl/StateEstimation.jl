@@ -22,6 +22,12 @@ try using AddPackage catch; using Pkg; Pkg.add("AddPackage") end
 # ╔═╡ 3cafb210-f89e-11ea-0cf2-bdf819224cc9
 @add using PlutoUI, Test, Random
 
+# ╔═╡ 8439ae70-fc99-11ea-2edb-51fc16909fa9
+@add using PyPlot; PyPlot.svg(true)
+
+# ╔═╡ c52df260-fc99-11ea-00a2-3f21b9c40f3b
+@add using Reel
+
 # ╔═╡ 85830e20-fb77-11ea-1e9f-d3651f6fe718
 @add using Suppressor
 
@@ -247,6 +253,26 @@ function sigma_points(μ, Σ, λ)
 	return S
 end
 
+# ╔═╡ 7179e070-fc99-11ea-1f02-511f2215c6a8
+function plot_kalman_filter(belief, true_state, iteration, action)
+    clf()
+	λ = 2	
+	S = sigma_points(belief.μᵦ, belief.Σᵦ, λ)
+	for s in S
+		plot(s..., "c.") # sigma points
+	end
+	
+	P = MvNormal(belief.μᵦ, Matrix(Hermitian(belief.Σᵦ))) # numerical stability
+	xdomain, ydomain = (-10, 10), (-10, 10)
+	plot_covariance(P, xdomain, ydomain) # covariance contours
+	
+	plot(true_state..., "ro") # true state
+    xlim([-10, 10])
+    ylim([-10, 10])
+    title("iteration=$iteration, action=$(round.(action, digits=4))")
+    gcf()
+end
+
 # ╔═╡ 00c94de0-fc74-11ea-0b52-a9b2938c5117
 md"""
 #### Weights
@@ -335,8 +361,51 @@ md"### Visualization"
 
 # ╔═╡ 83c7aa00-fc5d-11ea-3b99-e7290109a41b
 md"""
-$(@bind t_unscented Slider(0:2000, show_value=true, default=10))
+$(@bind t_ukf Slider(0:2000, show_value=true, default=10))
 """
+
+# ╔═╡ 7d654260-fc9b-11ea-09b3-49b98bdf8aba
+md"### Writing GIFs"
+
+# ╔═╡ 68e0a4d0-fc99-11ea-182b-8560cb2714cf
+begin
+	frames = Frames(MIME("image/png"), fps=2)
+	for iter in 1:30
+		global frames
+        Random.seed!(228)
+        μᵦ = rand(𝒮)
+		Σᵦ = Matrix(0.1I, 2, 2)
+		λ = 2.0
+		belief2plot = UnscentedKalmanFilter(μᵦ, Σᵦ, λ)
+        o_ukf = rand(𝒪)
+        s_ukf = copy(o_ukf)
+        a_ukf = missing
+
+		Tₛ = Matrix(1.0I, 2, 2)
+		Tₐ = Matrix(1.0I, 2, 2)
+		Σₛ = [1.0 0.0; 0.0 0.5]
+
+		Oₛ = Matrix(1.0I, 2, 2)
+		Σₒ = [1.0 0.0; 0.0 2.0]
+	
+		fₜ = (s,a) -> Tₛ*s + Tₐ*a
+		fₒ = s′ -> Oₛ*s′
+	
+		𝒫ᵤ = POMDPᵤ(fₜ, fₒ, Σₛ, Σₒ)
+
+		if iter == 1
+			# X initial frames stationary
+			[push!(frames,
+				   plot_kalman_filter(belief2plot, s_ukf, iter, [0,0])) for _ in 1:3]
+		end
+        for i in 1:iter
+            (belief2plot, s_ukf, a_ukf, o_ukf) =
+				step(belief2plot, 𝒫ᵤ, s_ukf, a_ukf, o_ukf, UKF.update!)
+        end
+		push!(frames, plot_kalman_filter(belief2plot, s_ukf, iter, a_ukf))
+	end
+	write("kalman_filter.gif", frames)
+end
 
 # ╔═╡ 802c5e80-f8b2-11ea-310f-6fdbcacb73d0
 md"## Helper code"
@@ -404,25 +473,7 @@ with_terminal() do
 end
 
 # ╔═╡ c9da23b2-fc49-11ea-16c5-776389af4472
-begin
-    @add using PyPlot; PyPlot.svg(true)
-    clf()
-	λ = 2	
-	S = sigma_points(belief.μᵦ, belief.Σᵦ, λ)
-	for s in S
-		plot(s..., "c.") # sigma points
-	end
-	
-	P = MvNormal(belief.μᵦ, belief.Σᵦ)
-	xdomain, ydomain = (-10, 10), (-10, 10)
-	plot_covariance(P, xdomain, ydomain) # covariance contours
-	
-	plot(s..., "ro") # true state
-    xlim([-10, 10])
-    ylim([-10, 10])
-    title("iteration=$t, action=$(round.(a, digits=4))")
-    gcf()
-end
+plot_kalman_filter(belief, s, t, a)
 
 # ╔═╡ 29206e50-fc3c-11ea-2f8d-8b876eab5bc4
 with_terminal() do
@@ -473,7 +524,7 @@ with_terminal() do
 	
 		global 𝒫ᵤ = POMDPᵤ(fₜ, fₒ, Σₛ, Σₒ)
 
-        for i in 1:t_unscented
+        for i in 1:t_ukf
             (belief_ukf, s_ukf, a_ukf, o_ukf) =
 				step(belief_ukf, 𝒫ᵤ, s_ukf, a_ukf, o_ukf, UKF.update!)
             # test_filter(belief_ukf, s_ukf)
@@ -484,23 +535,7 @@ with_terminal() do
 end
 
 # ╔═╡ 75b844b0-fc5d-11ea-0cef-4d5652f4cea2
-begin
-    clf()
-	S_ukf = sigma_points(belief_ukf.μᵦ, belief_ukf.Σᵦ, belief_ukf.λ)
-	for s in S_ukf
-		plot(s..., "c.") # sigma points
-	end
-	
-	P_ukf = MvNormal(belief_ukf.μᵦ, Matrix(Hermitian(belief_ukf.Σᵦ)))
-	xdomain_ukf, ydomain_ukf = (-10, 10), (-10, 10)
-	plot_covariance(P_ukf, xdomain_ukf, ydomain_ukf) # covariance contours
-	
-	plot(s_ukf..., "ro") # true state
-    xlim([-10, 10])
-    ylim([-10, 10])
-    title("iteration=$t, action=$(round.(a, digits=4))")
-    gcf()
-end
+plot_kalman_filter(belief_ukf, s_ukf, t_ukf, a_ukf)
 
 # ╔═╡ 4eb3bcc0-fc65-11ea-2485-e9211fb0685c
 with_terminal() do
@@ -545,7 +580,9 @@ end
 # ╠═c447b370-f7eb-11ea-1435-bd549afa0181
 # ╟─707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
 # ╠═c9da23b2-fc49-11ea-16c5-776389af4472
-# ╟─4726f4a0-fc50-11ea-12f5-7f19d21d9bcc
+# ╠═8439ae70-fc99-11ea-2edb-51fc16909fa9
+# ╠═7179e070-fc99-11ea-1f02-511f2215c6a8
+# ╠═4726f4a0-fc50-11ea-12f5-7f19d21d9bcc
 # ╟─d3fbb360-fc51-11ea-1522-3d04a8f3fb5f
 # ╠═29206e50-fc3c-11ea-2f8d-8b876eab5bc4
 # ╠═d83c01c0-fb78-11ea-0543-d3a0fdcbadab
@@ -574,6 +611,9 @@ end
 # ╟─83c7aa00-fc5d-11ea-3b99-e7290109a41b
 # ╠═75b844b0-fc5d-11ea-0cef-4d5652f4cea2
 # ╠═4eb3bcc0-fc65-11ea-2485-e9211fb0685c
+# ╟─7d654260-fc9b-11ea-09b3-49b98bdf8aba
+# ╠═c52df260-fc99-11ea-00a2-3f21b9c40f3b
+# ╠═68e0a4d0-fc99-11ea-182b-8560cb2714cf
 # ╟─802c5e80-f8b2-11ea-310f-6fdbcacb73d0
 # ╠═85830e20-fb77-11ea-1e9f-d3651f6fe718
 # ╟─67ebdf80-f8b2-11ea-2630-d54abc89ad2b

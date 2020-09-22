@@ -22,6 +22,9 @@ using AddPackage
 # ╔═╡ 3cafb210-f89e-11ea-0cf2-bdf819224cc9
 @add using PlutoUI, Test, Random
 
+# ╔═╡ b9b56160-fc95-11ea-18e0-737a0aa29148
+using Reel
+
 # ╔═╡ 85830e20-fb77-11ea-1e9f-d3651f6fe718
 @add using Suppressor
 
@@ -122,8 +125,49 @@ end;
 
 # ╔═╡ a30d19f0-fc66-11ea-211b-87a727b700cb
 md"""
-$(@bind t2 Slider(0:500, show_value=true, default=17))
+$(@bind t2 Slider(0:500, show_value=true, default=7))
 """
+
+# ╔═╡ 7a9c9430-fc95-11ea-3fa7-6bbf6c0aec33
+function plot_walk2d(belief, true_state, iteration, action)
+	clf()
+
+	scatter(belief[1,:], belief[2,:], 1, alpha=0.25, marker=".", color="black")
+
+	plot(true_state..., "ro")
+    xlim([-10, 10])
+    ylim([-10, 10])
+    title("iteration=$iteration, action=$(round.(action, digits=4))")
+    gcf()
+end
+
+# ╔═╡ fee6c082-fc9a-11ea-2209-3b9e1a3c9526
+md"### Writing GIFs"
+
+# ╔═╡ 71771e20-fc95-11ea-172c-3fa41cc22792
+begin
+	frames = Frames(MIME("image/png"), fps=2)
+	for iter in 1:30
+		Random.seed!(0x228)
+		global frames
+		belief2plot = rand(𝒮2, 1000)
+		o2plot = rand(𝒪2)
+		s2plot = o2plot
+		a2plot = missing
+		if iter == 1
+			# X initial frames stationary
+			[push!(frames,
+				   plot_walk2d(belief2plot, s2plot, iter, [0, 0])) for _ in 1:3]
+		end
+		for i in 1:iter
+			(belief2plot, s2plot, a2plot, o2plot) =
+				step(𝒫2, belief2plot, 𝒜2, s2plot, a2plot, o2plot,
+				     transition2, observation2)
+		end
+		push!(frames, plot_walk2d(belief2plot, s2plot, iter, a2plot))
+	end
+	write("particle_filter.gif", frames)
+end
 
 # ╔═╡ 802c5e80-f8b2-11ea-310f-6fdbcacb73d0
 md"## Helper code"
@@ -191,7 +235,7 @@ end
 with_terminal() do
 	# @testset begin
 		Random.seed!(0x228)
-		global m2 = 200
+		global m2 = 1000
 		global belief2 = rand(𝒮2, m2)
 		global o2 = rand(𝒪2)
 		global s2 = o2
@@ -206,17 +250,7 @@ with_terminal() do
 end
 
 # ╔═╡ 2794d330-fc66-11ea-0a35-f57068b69c0e
-begin
-    clf()
-
-	scatter(belief2[1,:], belief2[2,:], 1, alpha=0.25, marker=".", color="black")
-
-	plot(s2..., "ro") # true state
-    xlim([-10, 10])
-    ylim([-10, 10])
-    title("iteration=$t, action=$(round.(a, digits=4))")
-    gcf()
-end
+plot_walk2d(belief2, s2, t2, a2)
 
 # ╔═╡ 5c8239f0-fc90-11ea-2e1e-9703069d37af
 md"LaTeX-style fonts in `PyPlot`."
@@ -248,10 +282,14 @@ end
 # ╠═faf88970-fc65-11ea-3283-03df32338623
 # ╟─a30d19f0-fc66-11ea-211b-87a727b700cb
 # ╠═3cb2dc82-fc66-11ea-2772-6307b9e219d9
+# ╠═7a9c9430-fc95-11ea-3fa7-6bbf6c0aec33
 # ╠═2794d330-fc66-11ea-0a35-f57068b69c0e
+# ╟─fee6c082-fc9a-11ea-2209-3b9e1a3c9526
+# ╠═b9b56160-fc95-11ea-18e0-737a0aa29148
+# ╠═71771e20-fc95-11ea-172c-3fa41cc22792
 # ╟─802c5e80-f8b2-11ea-310f-6fdbcacb73d0
 # ╠═85830e20-fb77-11ea-1e9f-d3651f6fe718
 # ╟─67ebdf80-f8b2-11ea-2630-d54abc89ad2b
-# ╟─3145281e-fc3a-11ea-3f49-8590a886aa73
+# ╠═3145281e-fc3a-11ea-3f49-8590a886aa73
 # ╟─5c8239f0-fc90-11ea-2e1e-9703069d37af
-# ╟─dd875c22-fc8f-11ea-3557-6d3ad934151d
+# ╠═dd875c22-fc8f-11ea-3557-6d3ad934151d
