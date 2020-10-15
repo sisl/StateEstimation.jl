@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.11.14
+# v0.12.3
 
 using Markdown
 using InteractiveUtils
@@ -20,7 +20,7 @@ try using AddPackage catch; using Pkg; Pkg.add("AddPackage") end
 @add using Distributions, LinearAlgebra
 
 # ╔═╡ 3cafb210-f89e-11ea-0cf2-bdf819224cc9
-@add using PlutoUI, Test, Random
+@add using PlutoUI, Random
 
 # ╔═╡ 8439ae70-fc99-11ea-2edb-51fc16909fa9
 @add using PyPlot; PyPlot.svg(true)
@@ -35,19 +35,23 @@ try using AddPackage catch; using Pkg; Pkg.add("AddPackage") end
 include("section_counters.jl")
 
 # ╔═╡ 2cbec03e-fb77-11ea-09a2-634fac25a12a
-md"# Kalman filters"
+md"""
+# Kalman filters
 
-# ╔═╡ d9988c00-fc5e-11ea-12bf-e7bb28a68edb
-module KF function update! end end
+For code, see [StateEstimation.jl](https://github.com/mossr/StateEstimation.jl)
+"""
 
 # ╔═╡ 29e2d71e-fc40-11ea-0c55-f929ddc20588
-md"## Standard Kalman filter"
+md"""
+## Standard Kalman filter
+A special type of filter for continuous state spaces is known as the *Kalman filter*. The mean vector and covariance matrix that define the Gaussian belief are updated using a prediction. 
+"""
 
 # ╔═╡ 09fc2050-fc46-11ea-2bc4-257edf069912
 md"""
 $$\begin{align}
-𝛍_b \tag{belief mean vector}\\
-𝚺_b \tag{belief covariance matrix}
+𝛍_b \tag{mean belief vector}\\
+𝚺_b \tag{covariance belief matrix}
 \end{align}$$
 """
 
@@ -59,10 +63,12 @@ end
 
 # ╔═╡ 037674ae-fc41-11ea-025c-8510cc72063b
 md"""
+A *Kalman filter* assumes that $T$ and $O$ are linear-Gaussian and $b$ is Gaussian:
+
 $$\begin{align}
-\hspace{-2cm}T(𝐬^′ \mid 𝐬, 𝐚) &= \mathcal{N}(𝐬^′ \mid 𝐓_s 𝐬 + 𝐓_a 𝐚, 𝚺_s) \tag{linear-Gaussian transition}\\
-\hspace{-2cm}O(𝐨 \mid 𝐬^′) &= \mathcal{N}(𝐨 \mid 𝐎_s 𝐬^′, 𝚺_o) \tag{linear-Gaussian observation}\\
-\hspace{-2cm}b(𝐬) &= \mathcal{N}(𝐬 \mid 𝛍_b, 𝚺_b) \tag{Gaussian belief}
+\hspace{-3cm}T(𝐬^′ \mid 𝐬, 𝐚) &= \mathcal{N}(𝐬^′ \mid 𝐓_s 𝐬 + 𝐓_a 𝐚, 𝚺_s) \tag{linear-Gaussian transition}\\
+\hspace{-3cm}O(𝐨 \mid 𝐬^′) &= \mathcal{N}(𝐨 \mid 𝐎_s 𝐬^′, 𝚺_o) \tag{linear-Gaussian observation}\\
+\hspace{-3cm}b(𝐬) &= \mathcal{N}(𝐬 \mid 𝛍_b, 𝚺_b) \tag{Gaussian belief}
 \end{align}$$
 Where $𝚺_s$ is the state transition covariance and $𝚺_o$ is the observation covariance.
 """
@@ -74,7 +80,10 @@ struct POMDPₘ Tₛ; Tₐ; Oₛ; Σₛ; Σₒ end
 md"### Belief update"
 
 # ╔═╡ 3b261740-fc40-11ea-2253-012e10b5e6e6
-md"#### Kalman prediction"
+md"""
+#### Kalman prediction
+The *predict step* uses the transition dynamics to get a predicted distribution that is parameterized by the following mean and covariance.
+"""
 
 # ╔═╡ 80ae2940-fc42-11ea-3db3-bdf6de06f6df
 md"""
@@ -96,7 +105,10 @@ function kalman_predict(b::KalmanFilter, 𝒫::POMDPₘ, a)
 end
 
 # ╔═╡ 469be5f0-fc40-11ea-2a7a-23c9356b4b44
-md"#### Kalman update"
+md"""
+#### Kalman update
+The *update step* uses the prediction to update our belief.
+"""
 
 # ╔═╡ 2318aed2-fc43-11ea-24e6-19c5342b76a2
 md"""
@@ -123,7 +135,7 @@ function kalman_update!(b::KalmanFilter, 𝒫::POMDPₘ, o, μₚ, Σₚ)
 end
 
 # ╔═╡ 597bd862-fc3b-11ea-2c14-497f8746c4f3
-function KF.update!(b::KalmanFilter, 𝒫::POMDPₘ, a, o)
+function update!(b::KalmanFilter, 𝒫::POMDPₘ, a, o)
 	(μₚ, Σₚ) = kalman_predict(b, 𝒫, a)
 	kalman_update!(b, 𝒫, o, μₚ, Σₚ)
 end
@@ -144,12 +156,12 @@ begin
 	𝒮ₘₐₓ = maximum.(support.(𝒮.v))
 
 	𝒜 = MvNormal([0, 0], [1 0; 0 1])
-	𝒪 = Product(Uniform.([-10, -10], [10, 10]))
-
+	𝒪 = MvNormal([0, 0], [1 0; 0 1])
+	
 	transition = (s,a) -> clamp.(s .+ a, 𝒮ₘᵢₙ, 𝒮ₘₐₓ)
     T = (s,a) -> MvNormal(transition(s,a), I*abs.(a))
 
-	observation = (s′,a) -> MvNormal(s′, I*abs.(a))
+	observation = (s′,a) -> MvNormal(𝒪.μ + s′, 𝒪.Σ*abs.(a))
     O = (a,s′,o) -> pdf(observation(s′,a), o)
     𝒫 = POMDP(𝒮, 𝒜, 𝒪, T, O)
 end;
@@ -160,19 +172,7 @@ md"## Simulation and testing"
 # ╔═╡ 707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
 md"""
 $(@bind t Slider(0:2000, show_value=true, default=10))
-$(@bind stationary CheckBox())
 """
-
-# ╔═╡ a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
-function step(belief, 𝒫, s, a, o, updater!)
-    a = rand(𝒜)
-    if !stationary
-        s = transition(s, a)
-        o = rand(observation(s, a))
-    end
-    updater!(belief, 𝒫, a, o)
-    return (belief, s, a, o)
-end
 
 # ╔═╡ 4726f4a0-fc50-11ea-12f5-7f19d21d9bcc
 function plot_covariance(P, xdomain, ydomain; cmap="Blues", alpha=1)
@@ -184,40 +184,48 @@ function plot_covariance(P, xdomain, ydomain; cmap="Blues", alpha=1)
 		    cmap=cmap, alpha=alpha)
 end
 
-# ╔═╡ d3fbb360-fc51-11ea-1522-3d04a8f3fb5f
-md"## Testing"
-
-# ╔═╡ d83c01c0-fb78-11ea-0543-d3a0fdcbadab
-function test_filter(belief, s)
-    μ_b = belief.μᵦ
-    Σ_b = belief.Σᵦ
-    belief_error = abs.(μ_b - s)
-    @test (μ_b-3σ_b .≤ s .≤ μ_b+3σ_b) || belief_error .≤ 1.0
-end
-
 # ╔═╡ a2252160-fc5a-11ea-1c52-4717e186e8ff
 md"""
 ## Extended Kalman filter
-Extension to nonlinear Gaussian dynamics.
+Extension to nonlinear dynamics with Gaussian noise:
+
+$$\begin{align}
+T(\mathbf s^\prime \mid \mathbf s, \mathbf a) &= \mathcal{N}(\mathbf s^\prime \mid \mathbf f_T(\mathbf s, \mathbf a),\, 𝚺_s)\\
+O(\mathbf o \mid \mathbf s^\prime) &= \mathcal{N}(\mathbf o \mid \mathbf f_O(\mathbf s^\prime),\, 𝚺_o)
+\end{align}$$
+
+For differentialble functions $\mathbf f_T(\mathbf s, \mathbf a)$ and $\mathbf f_O(\mathbf s^\prime)$.
+
+> **Key**. Uses a local linear approximation of the nonlinear dynamics.
 """
 
-# ╔═╡ 1af42070-fc63-11ea-2530-8fd7dd722097
-module EKF function update! end end
+# ╔═╡ 98bc1fe0-0eb4-11eb-016d-1de4734348d3
+md"""
+### Jacobian
+The local linear approximation, or *linearization*, is given by first-order Taylor expansions in the form of Jacobians. The Jacobian of a vector-valued function is a matrix of all partial derivatives.
+
+For a multivariate function $$\mathbf{f}$$ with $n$ inputs and $m$ output, the Jacobian $\mathbf{J}_\mathbf{f}$ is:
+
+$$\mathbf{J}_\mathbf{f} = \begin{bmatrix}
+\frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_n}\\
+\vdots & \ddots & \vdots\\
+\frac{\partial f_m}{\partial x_1} & \cdots & \frac{\partial f_m}{\partial x_n}
+\end{bmatrix} = (m \times n) \text{ matrix}$$
+
+> See algorithm 19.4 for `ExtendedKalmanFilter` implementation.
+"""
 
 # ╔═╡ 5011a010-fc5a-11ea-22b8-df368e66c6cc
 md"""
 ## Unscented Kalman filter 🧼
-Derivative free!
+Derivative free! How clean!
 """
-
-# ╔═╡ 1d249500-fc63-11ea-2c5d-096cb2ddf773
-module UKF function update! end end
 
 # ╔═╡ 9a55a8f0-fc5b-11ea-15c6-abb241ea8770
 md"""
 $$\begin{gather}
-f_T \tag{transition dynamics function}\\
-f_O \tag{observation dynamics function}
+\mathbf f_T \tag{transition dynamics function}\\
+\mathbf f_O \tag{observation dynamics function}
 \end{gather}$$
 """
 
@@ -272,6 +280,36 @@ function plot_kalman_filter(belief, true_state, iteration, action)
     title("iteration=$iteration, action=$(round.(action, digits=4))")
     gcf()
 end
+
+# ╔═╡ 84e1f980-0eba-11eb-0c52-878cc6e04534
+function plot_sigma_points(μ, Σ, λ)
+    clf()
+	S = sigma_points(μ, Σ, λ)
+	for s in S
+		plot(s..., "c.") # sigma points
+	end
+	axis("equal")
+	xlim([-10, 10])
+	ylim([-10, 10])
+	gcf()
+end
+
+# ╔═╡ 3e0aab30-0eb8-11eb-1e6c-81a3d89d1cfb
+sigma_points([0.0, 0.0], [1 0; 0 1], 2) # example
+
+# ╔═╡ d0253f60-0eba-11eb-0283-e5b6e8c14ffe
+md"""
+Σ₁₁ = $(@bind Σ₁₁ Slider(1:10, default=1, show_value=true)) ... 
+Σ₁₂ = $(@bind Σ₁₂ Slider(0:10, default=0, show_value=true))
+
+Σ₂₁ = $(@bind Σ₂₁ Slider(0:10, default=0, show_value=true)) ...
+Σ₂₂ = $(@bind Σ₂₂ Slider(1:10, default=1, show_value=true)) 
+
+λ = $(@bind λₑₓ Slider(-1:10, default=2, show_value=true))
+"""
+
+# ╔═╡ b1773e60-0eba-11eb-36e6-3f0e9e7cc3b6
+plot_sigma_points([0.0, 0.0], [Σ₁₁ Σ₁₂; Σ₂₁ Σ₂₂], λₑₓ)
 
 # ╔═╡ 00c94de0-fc74-11ea-0b52-a9b2938c5117
 md"""
@@ -329,7 +367,7 @@ md"""
 #### Unscented update
 $$\begin{align}
 𝛍^′ &= \sum_i w_i 𝐟(𝐬_i)\\
-𝚺^′ &= \sum_i w_i(𝐟(𝐬_i) - 𝛍^′)(𝐟(𝐬_i) - 𝛍^′)^\top
+𝚺^′ &= \sum_i w_i\bigl(𝐟(𝐬_i) - 𝛍^′\bigr)\bigl(𝐟(𝐬_i) - 𝛍^′\bigr)^\top
 \end{align}$$
 """
 
@@ -349,11 +387,20 @@ function unscented_update!(b::UnscentedKalmanFilter, 𝒫::POMDPᵤ, o, μₚ, �
 end
 
 # ╔═╡ 2f556310-fc5b-11ea-291e-2b953413c453
-function UKF.update!(b::UnscentedKalmanFilter, 𝒫::POMDPᵤ, a, o)
+function update!(b::UnscentedKalmanFilter, 𝒫::POMDPᵤ, a, o)
 	(μᵦ, Σᵦ, λ) = (b.μᵦ, b.Σᵦ, b.λ)
 	wₛ = weights(μᵦ, λ)
 	(μₚ, Σₚ) = unscented_predict(b, 𝒫, a, wₛ)
 	unscented_update!(b, 𝒫, o, μₚ, Σₚ, wₛ)
+end
+
+# ╔═╡ a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
+function step(belief, 𝒫, s, a, o)
+    a = rand(𝒜)
+	s = transition(s, a)
+	o = rand(observation(s, a))
+    update!(belief, 𝒫, a, o)
+    return (belief, s, a, o)
 end
 
 # ╔═╡ 70c44350-fc5d-11ea-3331-ef2cf5ab1326
@@ -367,8 +414,11 @@ $(@bind t_ukf Slider(0:2000, show_value=true, default=10))
 # ╔═╡ 7d654260-fc9b-11ea-09b3-49b98bdf8aba
 md"### Writing GIFs"
 
+# ╔═╡ bd0736b0-0eb8-11eb-12bf-472687d2b830
+md"Write GIF? $(@bind write_gif CheckBox())"
+
 # ╔═╡ 68e0a4d0-fc99-11ea-182b-8560cb2714cf
-begin
+if write_gif
 	frames = Frames(MIME("image/png"), fps=2)
 	for iter in 1:30
 		global frames
@@ -400,7 +450,7 @@ begin
 		end
         for i in 1:iter
             (belief2plot, s_ukf, a_ukf, o_ukf) =
-				step(belief2plot, 𝒫ᵤ, s_ukf, a_ukf, o_ukf, UKF.update!)
+				step(belief2plot, 𝒫ᵤ, s_ukf, a_ukf, o_ukf)
         end
 		push!(frames, plot_kalman_filter(belief2plot, s_ukf, iter, a_ukf))
 	end
@@ -443,95 +493,61 @@ end
 
 # ╔═╡ c447b370-f7eb-11ea-1435-bd549afa0181
 with_terminal() do
-	@testset begin
-        Random.seed!(228)
-        μᵦ = rand(𝒮)
-		Σᵦ = Matrix(0.1I, 2, 2)
-		global belief = KalmanFilter(μᵦ, Σᵦ)
-        global o = rand(𝒪)
-        global s = copy(o)
-        global a = missing
+	Random.seed!(228)
+	μᵦ = rand(𝒮)
+	Σᵦ = Matrix(0.1I, 2, 2)
+	global belief = KalmanFilter(μᵦ, Σᵦ)
+	global o = rand(𝒪)
+	global s = copy(o)
+	global a = missing
 
-		Tₛ = Matrix(1.0I, 2, 2)
-		Tₐ = Matrix(1.0I, 2, 2)
-		# Σₛ = [1.0 0.0; 0.0 0.5]
-		Σₛ = copy(𝒜.Σ)
+	Tₛ = Matrix(1.0I, 2, 2)
+	Tₐ = Matrix(1.0I, 2, 2)
+	Σₛ = [0.5 0; 0 0.5]
 
-		Oₛ = Matrix(1.0I, 2, 2)
-		# Σₒ = [1.0 0.0; 0.0 2.0]
-		Σₒ = copy(𝒜.Σ)
+	Oₛ = Matrix(1.0I, 2, 2)
+	Σₒ = [1 0; 0 2]
 
-		global 𝒫ₘ = POMDPₘ(Tₛ, Tₐ, Oₛ, Σₛ, Σₒ)
+	global 𝒫ₘ = POMDPₘ(Tₛ, Tₐ, Oₛ, Σₛ, Σₒ)
 
-        for i in 1:t
-            (belief, s, a, o) = step(belief, 𝒫ₘ, s, a, o, KF.update!)
-            # test_filter(belief, s)
-        end
-		@show belief.μᵦ
-		@show belief.Σᵦ
+	for i in 1:t
+		(belief, s, a, o) = step(belief, 𝒫ₘ, s, a, o)
 	end
+	@show belief.μᵦ
+	@show belief.Σᵦ
 end
 
 # ╔═╡ c9da23b2-fc49-11ea-16c5-776389af4472
 plot_kalman_filter(belief, s, t, a)
 
-# ╔═╡ 29206e50-fc3c-11ea-2f8d-8b876eab5bc4
+# ╔═╡ 7d200530-fc5d-11ea-2ca9-8b81cebf13b0
 with_terminal() do
-	_s  = [-0.75, 1.0]
-	_s′ = [-0.25, 0.5]
-	_a  = _s′ - _s
-	_o = [-0.585, 0.731]
+	Random.seed!(228)
+	μᵦ = rand(𝒮)
+	Σᵦ = Matrix(0.1I, 2, 2)
+	λ = 2.0
+	global belief_ukf = UnscentedKalmanFilter(μᵦ, Σᵦ, λ)
+	global o_ukf = rand(𝒪)
+	global s_ukf = copy(o_ukf)
+	global a_ukf = missing
 
 	Tₛ = Matrix(1.0I, 2, 2)
 	Tₐ = Matrix(1.0I, 2, 2)
-	Σₛ = 0.1*[1.0 0.5; 0.5 1.0]
+	Σₛ = [0.5 0.0; 0.0 0.5]
 
 	Oₛ = Matrix(1.0I, 2, 2)
-	Σₒ = 0.05*[1.0 -0.5; -0.5 1.5]
+	Σₒ = [1.0 0.0; 0.0 2.0]
 
-	μᵦ = copy(_s)
-	Σᵦ = Matrix(0.1I, 2, 2)
-	kf = KalmanFilter(μᵦ, Σᵦ)
+	fₜ = (s,a) -> Tₛ*s + Tₐ*a
+	fₒ = s′ -> Oₛ*s′
 
-	𝒫ₘ = POMDPₘ(Tₛ, Tₐ, Oₛ, Σₛ, Σₒ)
+	global 𝒫ᵤ = POMDPᵤ(fₜ, fₒ, Σₛ, Σₒ)
 
-	KF.update!(kf, 𝒫ₘ, _a, _o)
-	@show isapprox(norm(kf.μᵦ - [-0.4889, 0.6223]), 0.0, atol=1e-4)
-	@show isapprox(norm(kf.Σᵦ - [0.0367 -0.0115; -0.0115 0.0505]), 0.0, atol=1e-4)
-end
-
-# ╔═╡ 7d200530-fc5d-11ea-2ca9-8b81cebf13b0
-with_terminal() do
-	# @testset begin
-        Random.seed!(228)
-        μᵦ = rand(𝒮)
-		Σᵦ = Matrix(0.1I, 2, 2)
-		λ = 2.0
-		global belief_ukf = UnscentedKalmanFilter(μᵦ, Σᵦ, λ)
-        global o_ukf = rand(𝒪)
-        global s_ukf = copy(o_ukf)
-        global a_ukf = missing
-
-		Tₛ = Matrix(1.0I, 2, 2)
-		Tₐ = Matrix(1.0I, 2, 2)
-		Σₛ = [1.0 0.0; 0.0 0.5]
-
-		Oₛ = Matrix(1.0I, 2, 2)
-		Σₒ = [1.0 0.0; 0.0 2.0]
-	
-		fₜ = (s,a) -> Tₛ*s + Tₐ*a
-		fₒ = s′ -> Oₛ*s′
-	
-		global 𝒫ᵤ = POMDPᵤ(fₜ, fₒ, Σₛ, Σₒ)
-
-        for i in 1:t_ukf
-            (belief_ukf, s_ukf, a_ukf, o_ukf) =
-				step(belief_ukf, 𝒫ᵤ, s_ukf, a_ukf, o_ukf, UKF.update!)
-            # test_filter(belief_ukf, s_ukf)
-        end
-		@show belief_ukf.μᵦ
-		@show belief_ukf.Σᵦ
-	# end
+	for i in 1:t_ukf
+		(belief_ukf, s_ukf, a_ukf, o_ukf) = step(belief_ukf, 𝒫ᵤ, s_ukf, a_ukf, o_ukf)
+	end
+	@show belief_ukf.μᵦ
+	@show belief_ukf.Σᵦ
 end
 
 # ╔═╡ 75b844b0-fc5d-11ea-0cef-4d5652f4cea2
@@ -553,9 +569,52 @@ begin
 	matplotlib.rc("text", usetex=true)
 end
 
+# ╔═╡ d3fbb360-fc51-11ea-1522-3d04a8f3fb5f
+md"## Testing"
+
+# ╔═╡ 29206e50-fc3c-11ea-2f8d-8b876eab5bc4
+with_terminal() do
+	_s  = [-0.75, 1.0]
+	_s′ = [-0.25, 0.5]
+	_a  = _s′ - _s
+	_o = [-0.585, 0.731]
+
+	Tₛ = Matrix(1.0I, 2, 2)
+	Tₐ = Matrix(1.0I, 2, 2)
+	Σₛ = 0.1*[1.0 0.5; 0.5 1.0]
+
+	Oₛ = Matrix(1.0I, 2, 2)
+	Σₒ = 0.05*[1.0 -0.5; -0.5 1.5]
+
+	μᵦ = copy(_s)
+	Σᵦ = Matrix(0.1I, 2, 2)
+	kf = KalmanFilter(μᵦ, Σᵦ)
+
+	𝒫ₘ = POMDPₘ(Tₛ, Tₐ, Oₛ, Σₛ, Σₒ)
+
+	update!(kf, 𝒫ₘ, _a, _o)
+	@show isapprox(norm(kf.μᵦ - [-0.4889, 0.6223]), 0.0, atol=1e-4)
+	@show isapprox(norm(kf.Σᵦ - [0.0367 -0.0115; -0.0115 0.0505]), 0.0, atol=1e-4)
+end
+
+# ╔═╡ d83c01c0-fb78-11ea-0543-d3a0fdcbadab
+function test_filter(belief, s)
+    μ_b = belief.μᵦ
+    Σ_b = belief.Σᵦ
+    belief_error = abs.(μ_b - s)
+    @test (μ_b-3σ_b .≤ s .≤ μ_b+3σ_b) || belief_error .≤ 1.0
+end
+
+# ╔═╡ 4eafc8d0-0eb3-11eb-2855-b121f3455d40
+md"""
+---
+"""
+
+# ╔═╡ efa90700-0914-11eb-38c3-0783ca0cf6e3
+PlutoUI.TableOfContents("Kalman Filtering")
+
 # ╔═╡ Cell order:
 # ╟─2cbec03e-fb77-11ea-09a2-634fac25a12a
-# ╠═d9988c00-fc5e-11ea-12bf-e7bb28a68edb
 # ╠═04c54992-fc46-11ea-39d5-d18c4392b483
 # ╠═740dc710-fbaf-11ea-2062-7f44056cbd12
 # ╟─29e2d71e-fc40-11ea-0c55-f929ddc20588
@@ -583,18 +642,18 @@ end
 # ╠═8439ae70-fc99-11ea-2edb-51fc16909fa9
 # ╠═7179e070-fc99-11ea-1f02-511f2215c6a8
 # ╠═4726f4a0-fc50-11ea-12f5-7f19d21d9bcc
-# ╟─d3fbb360-fc51-11ea-1522-3d04a8f3fb5f
-# ╠═29206e50-fc3c-11ea-2f8d-8b876eab5bc4
-# ╠═d83c01c0-fb78-11ea-0543-d3a0fdcbadab
 # ╟─a2252160-fc5a-11ea-1c52-4717e186e8ff
-# ╠═1af42070-fc63-11ea-2530-8fd7dd722097
+# ╟─98bc1fe0-0eb4-11eb-016d-1de4734348d3
 # ╟─5011a010-fc5a-11ea-22b8-df368e66c6cc
-# ╠═1d249500-fc63-11ea-2c5d-096cb2ddf773
 # ╟─9a55a8f0-fc5b-11ea-15c6-abb241ea8770
 # ╠═7dfa2370-fc5b-11ea-3d5d-d54349446b89
 # ╠═6feab390-fc5a-11ea-1367-c5f353fadbc7
 # ╟─48e7cb90-fc5d-11ea-0c29-c32610e59625
 # ╠═545eda20-fc5a-11ea-1e32-bfe408c99b35
+# ╠═84e1f980-0eba-11eb-0c52-878cc6e04534
+# ╠═3e0aab30-0eb8-11eb-1e6c-81a3d89d1cfb
+# ╟─d0253f60-0eba-11eb-0283-e5b6e8c14ffe
+# ╠═b1773e60-0eba-11eb-36e6-3f0e9e7cc3b6
 # ╟─00c94de0-fc74-11ea-0b52-a9b2938c5117
 # ╠═e1d59150-fc73-11ea-2b67-ef871a9d12b5
 # ╟─4f04e39e-fc5d-11ea-0b22-85563521ec7f
@@ -613,10 +672,16 @@ end
 # ╠═4eb3bcc0-fc65-11ea-2485-e9211fb0685c
 # ╟─7d654260-fc9b-11ea-09b3-49b98bdf8aba
 # ╠═c52df260-fc99-11ea-00a2-3f21b9c40f3b
+# ╟─bd0736b0-0eb8-11eb-12bf-472687d2b830
 # ╠═68e0a4d0-fc99-11ea-182b-8560cb2714cf
 # ╟─802c5e80-f8b2-11ea-310f-6fdbcacb73d0
 # ╠═85830e20-fb77-11ea-1e9f-d3651f6fe718
 # ╟─67ebdf80-f8b2-11ea-2630-d54abc89ad2b
 # ╠═48e32590-fc3a-11ea-3ff0-a7827e9847f1
 # ╟─f8ab7310-fc8f-11ea-0af1-f71a83f10460
-# ╟─dfad65e0-fc8e-11ea-2688-2b5004a3f834
+# ╠═dfad65e0-fc8e-11ea-2688-2b5004a3f834
+# ╟─d3fbb360-fc51-11ea-1522-3d04a8f3fb5f
+# ╠═29206e50-fc3c-11ea-2f8d-8b876eab5bc4
+# ╠═d83c01c0-fb78-11ea-0543-d3a0fdcbadab
+# ╟─4eafc8d0-0eb3-11eb-2855-b121f3455d40
+# ╠═efa90700-0914-11eb-38c3-0783ca0cf6e3

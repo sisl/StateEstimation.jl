@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.11.14
+# v0.12.3
 
 using Markdown
 using InteractiveUtils
@@ -32,7 +32,10 @@ using Reel
 include("section_counters.jl")
 
 # ╔═╡ 2cbec03e-fb77-11ea-09a2-634fac25a12a
-md"# Particle filter"
+md"""
+# Particle filter
+For code, see [StateEstimation.jl](https://github.com/mossr/StateEstimation.jl)
+"""
 
 # ╔═╡ 038c5510-f8bc-11ea-0fc5-7d765d868496
 md"## POMDP definition"
@@ -41,26 +44,25 @@ md"## POMDP definition"
 struct POMDP 𝒮; 𝒜; 𝒪; T; O end
 
 # ╔═╡ 1a06d470-f7e8-11ea-3640-c3964cba9e1f
-begin
-	function particle_filter(𝐛::Vector, 𝒫::POMDP, a, o)
-		(T, O) = (𝒫.T, 𝒫.O)
-		𝐬′ = rand.(T.(𝐛, a))
-		𝐰 = O.(a, 𝐬′, o)
-		D = Categorical(normalize(𝐰, 1))
-		return 𝐬′[rand(D, length(𝐬′))]
-	end
+function particle_filter(𝐛::Vector, 𝒫::POMDP, a, o)
+	(T, O) = (𝒫.T, 𝒫.O)
+	𝐬′ = rand.(T.(𝐛, a))
+	𝐰 = O.(a, 𝐬′, o)
+	𝒞 = Categorical(normalize(𝐰, 1))
+	return 𝐬′[rand(𝒞, length(𝐬′))]
+end
 
-	function particle_filter(𝐛::Matrix, 𝒫::POMDP, a, o)
-		(T, O) = (𝒫.T, 𝒫.O)
-		𝐬′ = mapslices(b->rand(T(b, a)), 𝐛; dims=1)
-		𝐰 = mapslices(s′->O(a, s′, o), 𝐬′; dims=1)
-		𝐰ₙ = mapslices(w->normalize(w, 1), 𝐰; dims=2)
-		if isnan(sum(𝐰ₙ))
-			fill!(𝐰ₙ, 1/length(𝐰ₙ))
-		end
-		D = Categorical(vec(𝐰ₙ))
-		return 𝐬′[:, rand(D, size(𝐬′, 2))]
+# ╔═╡ 0faf1df0-0915-11eb-3b6a-f7b7a43ded72
+function particle_filter(𝐛::Matrix, 𝒫::POMDP, a, o)
+	(T, O) = (𝒫.T, 𝒫.O)
+	𝐬′ = mapslices(b->rand(T(b, a)), 𝐛; dims=1)
+	𝐰 = mapslices(s′->O(a, s′, o), 𝐬′; dims=1)
+	𝐰ₙ = mapslices(w->normalize(w, 1), 𝐰; dims=2)
+	if isnan(sum(𝐰ₙ))
+		fill!(𝐰ₙ, 1/length(𝐰ₙ))
 	end
+	𝒞 = Categorical(vec(𝐰ₙ))
+	return 𝐬′[:, rand(𝒞, size(𝐬′, 2))]
 end
 
 # ╔═╡ 608a4850-f7e8-11ea-2fca-af35a2f0456b
@@ -144,8 +146,11 @@ end
 # ╔═╡ fee6c082-fc9a-11ea-2209-3b9e1a3c9526
 md"### Writing GIFs"
 
+# ╔═╡ 53f0f440-0ebd-11eb-2f96-1922d5513f58
+md"Write GIF? $(@bind write_gif CheckBox())"
+
 # ╔═╡ 71771e20-fc95-11ea-172c-3fa41cc22792
-begin
+if write_gif
 	frames = Frames(MIME("image/png"), fps=2)
 	for iter in 1:30
 		Random.seed!(0x228)
@@ -263,11 +268,15 @@ begin
 	matplotlib.rc("text", usetex=true)
 end
 
+# ╔═╡ 1a9752a0-0915-11eb-08f0-83645bd80880
+PlutoUI.TableOfContents("Particle Filtering")
+
 # ╔═╡ Cell order:
 # ╟─2cbec03e-fb77-11ea-09a2-634fac25a12a
 # ╠═740dc710-fbaf-11ea-2062-7f44056cbd12
 # ╠═de842650-f7e7-11ea-3f11-5b92ea413bb5
 # ╠═1a06d470-f7e8-11ea-3640-c3964cba9e1f
+# ╠═0faf1df0-0915-11eb-3b6a-f7b7a43ded72
 # ╟─038c5510-f8bc-11ea-0fc5-7d765d868496
 # ╠═5d9e4bf0-f7e8-11ea-23d8-2dbd72e46ce6
 # ╠═608a4850-f7e8-11ea-2fca-af35a2f0456b
@@ -286,6 +295,7 @@ end
 # ╠═2794d330-fc66-11ea-0a35-f57068b69c0e
 # ╟─fee6c082-fc9a-11ea-2209-3b9e1a3c9526
 # ╠═b9b56160-fc95-11ea-18e0-737a0aa29148
+# ╟─53f0f440-0ebd-11eb-2f96-1922d5513f58
 # ╠═71771e20-fc95-11ea-172c-3fa41cc22792
 # ╟─802c5e80-f8b2-11ea-310f-6fdbcacb73d0
 # ╠═85830e20-fb77-11ea-1e9f-d3651f6fe718
@@ -293,3 +303,4 @@ end
 # ╠═3145281e-fc3a-11ea-3f49-8590a886aa73
 # ╟─5c8239f0-fc90-11ea-2e1e-9703069d37af
 # ╠═dd875c22-fc8f-11ea-3557-6d3ad934151d
+# ╠═1a9752a0-0915-11eb-08f0-83645bd80880
