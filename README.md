@@ -13,14 +13,28 @@ Then open Julia, run `using Pluto; Pluto.run()`, and open notebooks in `~/.julia
 
 # Pluto notebooks
 
-[![Section overview](https://img.shields.io/badge/pluto-section%20overview-8c1515)](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/section_overview.html)
+<!-- [![Section overview](https://img.shields.io/badge/pluto-section%20overview-8c1515)](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/section_overview.html)
+ -->
+
+## Crying baby POMDP
+
+[![Crying baby](https://img.shields.io/badge/pluto-crying%20baby%20POMDP-d2c295)](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/crying_baby_problem.html)
+<p align="center">
+  <kbd>
+    <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/crying_baby_problem.html">
+      <img src="./html/crying_baby_problem.svg">
+    </a>
+  </kbd>
+</p>
 
 
 ## Kalman filtering
 
 [![Kalman filtering](https://img.shields.io/badge/pluto-kalman%20filtering-00505c)](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/kalman_filter.html)
 <p align="center">
-  <img src="./gif/kalman_filter.gif">
+  <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/kalman_filter.html">
+    <img src="./gif/kalman_filter.gif">
+  </a>
 </p>
 
 
@@ -28,7 +42,9 @@ Then open Julia, run `using Pluto; Pluto.run()`, and open notebooks in `~/.julia
 
 [![Particle filtering](https://img.shields.io/badge/pluto-particle%20filtering-928b81)](http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/particle_filter.html)
 <p align="center">
-  <img src="./gif/particle_filter.gif">
+  <a href="http://htmlpreview.github.io/?https://raw.githubusercontent.com/mossr/StateEstimation.jl/master/html/particle_filter.html">
+    <img src="./gif/particle_filter.gif">
+  </a>
 </p>
 
 
