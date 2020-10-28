@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.3
+# v0.12.4
 
 using Markdown
 using InteractiveUtils
@@ -17,9 +17,9 @@ md"""
 The state, action, and observation spaces are:
 
 $$\begin{align}
-	\mathcal{S} &= \{\text{hungry},\, \text{sated}\}\\
-	\mathcal{A} &= \{\text{feed},\, \text{sing},\, \text{ignore}\}\\
-	\mathcal{O} &= \{\text{crying},\, \text{quiet}\}
+	\mathcal{S} &= \{\text{hungry},\, \text{sated}\}\tag{state space}\\
+	\mathcal{A} &= \{\text{feed},\, \text{sing},\, \text{ignore}\}\tag{action space}\\
+	\mathcal{O} &= \{\text{crying},\, \text{quiet}\}\tag{observation space}
 \end{align}$$
 """
 
@@ -33,6 +33,11 @@ end
 # ╔═╡ a0d7ddc0-0f1a-11eb-291d-59e2b1633f67
 md"""
 ## POMDP definition
+"""
+
+# ╔═╡ 105acfb0-195a-11eb-0920-89dfeeedd245
+md"""
+$$\langle \mathcal{S}, \mathcal{A}, \mathcal{O}, T, R, O, \gamma \rangle\tag{POMDP 7-tuple}$$
 """
 
 # ╔═╡ a4f86280-0f1a-11eb-104e-8fef3d3303ef
@@ -114,7 +119,7 @@ end
 md"""
 ## Belief updating
 $$\begin{gather}
-b^\prime(s^\prime) \propto O(o \mid a, s^\prime) \sum_s T(s^\prime \mid s, a)b(s)
+b^\prime(s^\prime) \propto O(o \mid a, s^\prime) \sum_s T(s^\prime \mid s, a)b(s) \tag{then normalize}
 \end{gather}$$
 """
 
@@ -126,8 +131,7 @@ function update(b::Vector{Float64}, 𝒫, a, o)
 	𝒮, T, O = 𝒫.𝒮 ,𝒫.T, 𝒫.O
 	b′ = similar(b)
 	for (i′, s′) in enumerate(𝒮)
-		po = O(a, s′, o)
-		b′[i′] = po * sum(T(s, a, s′) * b[i] for (i, s) in enumerate(𝒮))
+		b′[i′] = O(a, s′, o) * sum(T(s, a, s′) * b[i] for (i, s) in enumerate(𝒮))
 	end
 	if sum(b′) ≈ 0.0
 		fill!(b′, 1)
@@ -140,10 +144,18 @@ md"""
 # Instantiating the crying baby POMDP
 """
 
+# ╔═╡ e35cb6de-1959-11eb-09dc-938c74a5877b
+# State, action, and observation spaces
+begin
+	𝒮 = (hungry, sated)
+	𝒜 = (feed, sing, ignore)
+	𝒪 = (crying, quiet)
+end;
+
 # ╔═╡ 90dba720-0f1b-11eb-2d19-f501bb8f3286
-𝒫 = POMDP((hungry, sated),      # state space
-	      (feed, sing, ignore), # action space
-	      (crying, quiet),      # observation space
+𝒫 = POMDP(𝒮,   # state space
+	      𝒜,   # action space
+	      𝒪,   # observation space
 	      T,   # transition model
 	      R,   # reward model
 	      O,   # observation model
@@ -213,6 +225,7 @@ And recall, this final belief $b_5$ is telling us that we *believe* the baby is 
 # ╟─7b68d4d0-0f20-11eb-2484-b354c4cff750
 # ╠═70bb6df0-0f1a-11eb-0055-25079b36caaf
 # ╟─a0d7ddc0-0f1a-11eb-291d-59e2b1633f67
+# ╟─105acfb0-195a-11eb-0920-89dfeeedd245
 # ╠═a4f86280-0f1a-11eb-104e-8fef3d3303ef
 # ╟─7b94ae80-0f1a-11eb-1aef-eb26390584d8
 # ╟─928b39a0-0f20-11eb-10e9-d1289faf91f9
@@ -225,6 +238,7 @@ And recall, this final belief $b_5$ is telling us that we *believe* the baby is 
 # ╠═b04ebe20-0f21-11eb-2607-0b01c99ac423
 # ╠═b4db7662-0f1a-11eb-3fb8-d58feae7e66c
 # ╟─84db99ce-0f1b-11eb-27a3-678c1c091540
+# ╠═e35cb6de-1959-11eb-09dc-938c74a5877b
 # ╠═90dba720-0f1b-11eb-2d19-f501bb8f3286
 # ╟─b1dc4ab0-0f1b-11eb-3f29-dbfcbd991121
 # ╟─bcbda190-0f1b-11eb-147e-79986a90edef

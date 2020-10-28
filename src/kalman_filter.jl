@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.3
+# v0.12.4
 
 using Markdown
 using InteractiveUtils
@@ -30,6 +30,9 @@ try using AddPackage catch; using Pkg; Pkg.add("AddPackage") end
 
 # ╔═╡ 85830e20-fb77-11ea-1e9f-d3651f6fe718
 @add using Suppressor
+
+# ╔═╡ 5bd86070-194f-11eb-21f9-f57ce27aa5d0
+using Test
 
 # ╔═╡ 48e32590-fc3a-11ea-3ff0-a7827e9847f1
 include("section_counters.jl")
@@ -611,7 +614,7 @@ md"""
 """
 
 # ╔═╡ efa90700-0914-11eb-38c3-0783ca0cf6e3
-PlutoUI.TableOfContents("Kalman Filtering")
+try PlutoUI.TableOfContents("Kalman Filtering"); catch end
 
 # ╔═╡ Cell order:
 # ╟─2cbec03e-fb77-11ea-09a2-634fac25a12a
@@ -681,6 +684,7 @@ PlutoUI.TableOfContents("Kalman Filtering")
 # ╟─f8ab7310-fc8f-11ea-0af1-f71a83f10460
 # ╠═dfad65e0-fc8e-11ea-2688-2b5004a3f834
 # ╟─d3fbb360-fc51-11ea-1522-3d04a8f3fb5f
+# ╠═5bd86070-194f-11eb-21f9-f57ce27aa5d0
 # ╠═29206e50-fc3c-11ea-2f8d-8b876eab5bc4
 # ╠═d83c01c0-fb78-11ea-0543-d3a0fdcbadab
 # ╟─4eafc8d0-0eb3-11eb-2855-b121f3455d40

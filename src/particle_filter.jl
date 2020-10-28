@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.3
+# v0.12.4
 
 using Markdown
 using InteractiveUtils
@@ -14,7 +14,7 @@ macro bind(def, element)
 end
 
 # ╔═╡ 740dc710-fbaf-11ea-2062-7f44056cbd12
-using AddPackage
+try using AddPackage catch; using Pkg; Pkg.add("AddPackage") end
 
 # ╔═╡ de842650-f7e7-11ea-3f11-5b92ea413bb5
 @add using Distributions, LinearAlgebra
@@ -23,7 +23,7 @@ using AddPackage
 @add using PlutoUI, Test, Random
 
 # ╔═╡ b9b56160-fc95-11ea-18e0-737a0aa29148
-using Reel
+@add using Reel
 
 # ╔═╡ 85830e20-fb77-11ea-1e9f-d3651f6fe718
 @add using Suppressor
@@ -125,11 +125,6 @@ begin
     𝒫2 = POMDP(𝒮2, 𝒜2, 𝒪2, T2, O2)
 end;
 
-# ╔═╡ a30d19f0-fc66-11ea-211b-87a727b700cb
-md"""
-$(@bind t2 Slider(0:500, show_value=true, default=7))
-"""
-
 # ╔═╡ 7a9c9430-fc95-11ea-3fa7-6bbf6c0aec33
 function plot_walk2d(belief, true_state, iteration, action)
 	clf()
@@ -142,6 +137,11 @@ function plot_walk2d(belief, true_state, iteration, action)
     title("iteration=$iteration, action=$(round.(action, digits=4))")
     gcf()
 end
+
+# ╔═╡ a30d19f0-fc66-11ea-211b-87a727b700cb
+md"""
+$(@bind t2 Slider(0:500, show_value=true, default=7))
+"""
 
 # ╔═╡ fee6c082-fc9a-11ea-2209-3b9e1a3c9526
 md"### Writing GIFs"
@@ -238,20 +238,17 @@ end
 
 # ╔═╡ 3cb2dc82-fc66-11ea-2772-6307b9e219d9
 with_terminal() do
-	# @testset begin
-		Random.seed!(0x228)
-		global m2 = 1000
-		global belief2 = rand(𝒮2, m2)
-		global o2 = rand(𝒪2)
-		global s2 = o2
-		global a2 = missing
-		for i in 1:t2
-			(belief2, s2, a2, o2) = step(𝒫2, belief2, 𝒜2, s2, a2, o2,
-			                             transition2, observation2)
-			# test_filter(belief, s)
-		end
-		@show s2
-	# end
+	Random.seed!(0x228)
+	global m2 = 1000
+	global belief2 = rand(𝒮2, m2)
+	global o2 = rand(𝒪2)
+	global s2 = o2
+	global a2 = missing
+	for i in 1:t2
+		(belief2, s2, a2, o2) = step(𝒫2, belief2, 𝒜2, s2, a2, o2,
+									 transition2, observation2)
+	end
+	@show s2
 end
 
 # ╔═╡ 2794d330-fc66-11ea-0a35-f57068b69c0e
@@ -269,7 +266,7 @@ begin
 end
 
 # ╔═╡ 1a9752a0-0915-11eb-08f0-83645bd80880
-PlutoUI.TableOfContents("Particle Filtering")
+try PlutoUI.TableOfContents("Particle Filtering"); catch end
 
 # ╔═╡ Cell order:
 # ╟─2cbec03e-fb77-11ea-09a2-634fac25a12a
@@ -289,9 +286,9 @@ PlutoUI.TableOfContents("Particle Filtering")
 # ╠═43027b00-f7ec-11ea-3354-c15426d5e63f
 # ╟─f45355a0-fc65-11ea-26ff-1fd18bdbfdb2
 # ╠═faf88970-fc65-11ea-3283-03df32338623
-# ╟─a30d19f0-fc66-11ea-211b-87a727b700cb
 # ╠═3cb2dc82-fc66-11ea-2772-6307b9e219d9
 # ╠═7a9c9430-fc95-11ea-3fa7-6bbf6c0aec33
+# ╟─a30d19f0-fc66-11ea-211b-87a727b700cb
 # ╠═2794d330-fc66-11ea-0a35-f57068b69c0e
 # ╟─fee6c082-fc9a-11ea-2209-3b9e1a3c9526
 # ╠═b9b56160-fc95-11ea-18e0-737a0aa29148
