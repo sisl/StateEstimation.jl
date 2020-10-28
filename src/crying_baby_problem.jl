@@ -59,6 +59,8 @@ Also call the *transition function*.
 
 # ╔═╡ 928b39a0-0f20-11eb-10e9-d1289faf91f9
 md"""
+$$T(s^\prime \mid a, s)$$
+
 $$\begin{aligned}
     T(\text{sated}  \mid &\>\text{hungry}, \text{feed}) &= 100\% \\
     T(\text{hungry} \mid &\>\text{hungry}, \text{sing}) &= 100\% \\
@@ -84,6 +86,8 @@ end
 md"""
 ## Reward model
 Also called the *reward function*. We assign $-10$ reward if the baby is hungry and $-5$ reward for feeding the baby (which is additive). Singing to a *sated* baby yields $5$ reward, but singing to a *hungry* baby incurs $-2$ reward.
+
+$$R(s,a)$$
 """
 
 # ╔═╡ 77b50350-0f1a-11eb-3518-2f84ee105ca1
@@ -98,6 +102,8 @@ end
 md"""
 ## Observation model
 A *hungry* baby cries $80\%$ of the time, whereas a *sated* baby cries $10\%$ of the time. Singing to the baby yields a perfect observation.
+
+$$O(o \mid a, s^\prime)$$
 """
 
 # ╔═╡ 7a273bd0-0f1a-11eb-3218-8b33c0141bb8
