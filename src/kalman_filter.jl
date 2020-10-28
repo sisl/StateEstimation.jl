@@ -145,28 +145,21 @@ end
 
 # ╔═╡ 038c5510-f8bc-11ea-0fc5-7d765d868496
 md"""
-## POMDP definition
+## Agent definition
 Agent randomly walking in a $10\times10$ continuous 2D environment.
 """
 
-# ╔═╡ 5d9e4bf0-f7e8-11ea-23d8-2dbd72e46ce6
-struct POMDP 𝒮; 𝒜; 𝒪; T; O end
-
 # ╔═╡ 608a4850-f7e8-11ea-2fca-af35a2f0456b
 begin
-    𝒮 = Product(Uniform.([-10, -10], [10, 10]))
+    global 𝒮 = Product(Uniform.([-10, -10], [10, 10]))
 	𝒮ₘᵢₙ = minimum.(support.(𝒮.v))
 	𝒮ₘₐₓ = maximum.(support.(𝒮.v))
 
-	𝒜 = MvNormal([0, 0], [1 0; 0 1])
-	𝒪 = MvNormal([0, 0], [1 0; 0 1])
+	global 𝒜 = MvNormal([0, 0], [1 0; 0 1])
+	global 𝒪 = MvNormal([0, 0], [1 0; 0 1])
 	
-	transition = (s,a) -> clamp.(s .+ a, 𝒮ₘᵢₙ, 𝒮ₘₐₓ)
-    T = (s,a) -> MvNormal(transition(s,a), I*abs.(a))
-
-	observation = (s′,a) -> MvNormal(𝒪.μ + s′, 𝒪.Σ*abs.(a))
-    O = (a,s′,o) -> pdf(observation(s′,a), o)
-    𝒫 = POMDP(𝒮, 𝒜, 𝒪, T, O)
+	global transition = (s,a) -> clamp.(s .+ a, 𝒮ₘᵢₙ, 𝒮ₘₐₓ) # deterministic next state
+	global observation = (s′,a) -> MvNormal(𝒪.μ + s′, 𝒪.Σ*abs.(a)) # obs. distribution
 end;
 
 # ╔═╡ 4099e950-fb77-11ea-23b7-6d1f7b47c07e
@@ -329,6 +322,14 @@ w_i &= \begin{cases}
 # ╔═╡ e1d59150-fc73-11ea-2b67-ef871a9d12b5
 weights(μ, λ; n=length(μ)) = [λ / (n + λ); fill(1/(2*(n + λ)), 2n)]
 
+# ╔═╡ 5564aa00-fc5d-11ea-2a66-b5f9edef3f03
+md"""
+### Belief update
+"""
+
+# ╔═╡ 5ddbdeb0-fc5d-11ea-3600-21920d6bf4a2
+md"#### Unscented prediction"
+
 # ╔═╡ 4f04e39e-fc5d-11ea-0b22-85563521ec7f
 md"#### Unscented transform"
 
@@ -348,14 +349,6 @@ function unscented_transform(μ, Σ, f, λ, wₛ)
 	Σ′ = sum(w*(s - μ′)*(s - μ′)' for (w,s) in zip(wₛ, S′))
 	return (μ′, Σ′, S, S′)
 end
-
-# ╔═╡ 5564aa00-fc5d-11ea-2a66-b5f9edef3f03
-md"""
-### Belief update
-"""
-
-# ╔═╡ 5ddbdeb0-fc5d-11ea-3600-21920d6bf4a2
-md"#### Unscented prediction"
 
 # ╔═╡ d1fc7c70-fc5b-11ea-3c17-7f3e5bc58b44
 function unscented_predict(b::UnscentedKalmanFilter, 𝒫::POMDPᵤ, a, wₛ)
@@ -634,7 +627,6 @@ try PlutoUI.TableOfContents("Kalman Filtering"); catch end
 # ╟─2318aed2-fc43-11ea-24e6-19c5342b76a2
 # ╠═f6437792-fc3e-11ea-2941-2ba90b95ecee
 # ╟─038c5510-f8bc-11ea-0fc5-7d765d868496
-# ╠═5d9e4bf0-f7e8-11ea-23d8-2dbd72e46ce6
 # ╠═608a4850-f7e8-11ea-2fca-af35a2f0456b
 # ╟─4099e950-fb77-11ea-23b7-6d1f7b47c07e
 # ╠═3cafb210-f89e-11ea-0cf2-bdf819224cc9
@@ -659,13 +651,13 @@ try PlutoUI.TableOfContents("Kalman Filtering"); catch end
 # ╠═b1773e60-0eba-11eb-36e6-3f0e9e7cc3b6
 # ╟─00c94de0-fc74-11ea-0b52-a9b2938c5117
 # ╠═e1d59150-fc73-11ea-2b67-ef871a9d12b5
-# ╟─4f04e39e-fc5d-11ea-0b22-85563521ec7f
-# ╟─9746c3d0-fc72-11ea-2d9a-5dbe53753813
-# ╠═f6aab420-fc5a-11ea-122f-d356a54e953c
 # ╟─5564aa00-fc5d-11ea-2a66-b5f9edef3f03
 # ╠═2f556310-fc5b-11ea-291e-2b953413c453
 # ╟─5ddbdeb0-fc5d-11ea-3600-21920d6bf4a2
 # ╠═d1fc7c70-fc5b-11ea-3c17-7f3e5bc58b44
+# ╟─4f04e39e-fc5d-11ea-0b22-85563521ec7f
+# ╟─9746c3d0-fc72-11ea-2d9a-5dbe53753813
+# ╠═f6aab420-fc5a-11ea-122f-d356a54e953c
 # ╟─63dd3160-fc5d-11ea-223d-3119cff7630d
 # ╠═d9d1a4c0-fc5b-11ea-0d6c-ab55c2b33d19
 # ╟─70c44350-fc5d-11ea-3331-ef2cf5ab1326

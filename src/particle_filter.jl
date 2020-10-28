@@ -80,6 +80,15 @@ end
 # ╔═╡ 4099e950-fb77-11ea-23b7-6d1f7b47c07e
 md"## Simulation and testing"
 
+# ╔═╡ a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
+function step(𝒫, belief, 𝒜, s, a, o, transition, observation)
+	a = rand(𝒜)
+	s = transition(s, a)
+	o = rand(observation(s, a))
+	belief = particle_filter(belief, 𝒫, a, o)
+	return (belief, s, a, o)
+end
+
 # ╔═╡ d83c01c0-fb78-11ea-0543-d3a0fdcbadab
 function test_filter(belief, s)
 	μ_b = mean(belief)
@@ -89,21 +98,7 @@ function test_filter(belief, s)
 end
 
 # ╔═╡ 707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
-md"""
-$(@bind t Slider(0:2000, show_value=true, default=10))
-$(@bind stationary CheckBox())
-"""
-
-# ╔═╡ a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
-function step(𝒫, belief, 𝒜, s, a, o, transition, observation)
-	a = rand(𝒜)
-	if !stationary
-		s = transition(s, a)
-		o = rand(observation(s, a))
-	end
-	belief = particle_filter(belief, 𝒫, a, o)
-	return (belief, s, a, o)
-end
+@bind t Slider(0:2000, show_value=true, default=10)
 
 # ╔═╡ f45355a0-fc65-11ea-26ff-1fd18bdbfdb2
 md"## Random walk 2D example"
@@ -282,7 +277,7 @@ try PlutoUI.TableOfContents("Particle Filtering"); catch end
 # ╠═a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
 # ╠═d83c01c0-fb78-11ea-0543-d3a0fdcbadab
 # ╠═c447b370-f7eb-11ea-1435-bd549afa0181
-# ╟─707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
+# ╠═707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
 # ╠═43027b00-f7ec-11ea-3354-c15426d5e63f
 # ╟─f45355a0-fc65-11ea-26ff-1fd18bdbfdb2
 # ╠═faf88970-fc65-11ea-3283-03df32338623

@@ -54,7 +54,7 @@ end
 # ╔═╡ 7b94ae80-0f1a-11eb-1aef-eb26390584d8
 md"""
 ## Transition model
-Also call the *transition function*.
+Also called the *transition function*.
 """
 
 # ╔═╡ 928b39a0-0f20-11eb-10e9-d1289faf91f9
@@ -62,12 +62,12 @@ md"""
 $$T(s^\prime \mid a, s)$$
 
 $$\begin{aligned}
-    T(\text{sated}  \mid &\>\text{hungry}, \text{feed}) &= 100\% \\
-    T(\text{hungry} \mid &\>\text{hungry}, \text{sing}) &= 100\% \\
-    T(\text{hungry} \mid &\>\text{hungry}, \text{ignore}) &= 100\% \\
-    T(\text{sated}  \mid &\>\text{sated}, \text{feed}) &= 100\% \\
-    T(\text{hungry} \mid &\>\text{sated}, \text{sing}) &= 10\% \\
-    T(\text{hungry} \mid &\>\text{sated}, \text{ignore}) &= 10\%
+    T(\text{sated}  \ \mid &\>\text{hungry}, \text{feed}) &= 100\% \\
+    T(\text{hungry} \ \mid &\>\text{hungry}, \text{sing}) &= 100\% \\
+    T(\text{hungry} \ \mid &\>\text{hungry}, \text{ignore}) &= 100\% \\
+    T(\text{sated}  \ \mid &\>\text{sated}, \text{feed}) &= 100\% \\
+    T(\text{hungry} \ \mid &\>\text{sated}, \text{sing}) &= 10\% \\
+    T(\text{hungry} \ \mid &\>\text{sated}, \text{ignore}) &= 10\%
 \end{aligned}$$
 """
 
@@ -151,7 +151,7 @@ md"""
 """
 
 # ╔═╡ e35cb6de-1959-11eb-09dc-938c74a5877b
-# State, action, and observation spaces
+# State, action, and observation spaces (or sets)
 begin
 	𝒮 = (hungry, sated)
 	𝒜 = (feed, sing, ignore)
