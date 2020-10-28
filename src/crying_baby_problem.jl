@@ -169,7 +169,7 @@ end;
 
 # ╔═╡ b1dc4ab0-0f1b-11eb-3f29-dbfcbd991121
 md"""
-## Example: updaing beliefs
+## Example: updating beliefs
 $$\mathbf b = \begin{bmatrix} p(\text{hungry}) \\ p(\text{sated})\end{bmatrix} = \text{belief vector over states}$$
 """
 
