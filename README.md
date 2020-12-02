@@ -1,5 +1,4 @@
 # StateEstimation.jl
-[![https://img.shields.io/badge/active-work%20in%20progress-orange](https://img.shields.io/badge/active-work%20in%20progress-orange)](https://github.com/mossr/StateEstimation.jl)
 
 Section for AA228/CS238 *Decision Making Under Uncertainty* at Stanford University.
 
