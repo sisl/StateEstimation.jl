@@ -1,6 +1,6 @@
 # StateEstimation.jl
 
-Section for AA228/CS238 *Decision Making Under Uncertainty* at Stanford University.
+Section for CS238/AA228 *Decision Making Under Uncertainty* at Stanford University.
 
 Belief state estimation in [Pluto](https://github.com/fonsp/Pluto.jl) notebooks.
 
