@@ -16,7 +16,7 @@ end
 # ╔═╡ 740dc710-fbaf-11ea-2062-7f44056cbd12
 using Distributions, LinearAlgebra
 
-# ╔═╡ 3cafb210-f89e-11ea-0cf2-bdf819224cc9
+# ╔═╡ 7901f281-a3ff-477c-b292-6121ce12af32
 using PlutoUI, Random
 
 # ╔═╡ 83560088-c06d-4f9d-976e-63732ba206e6
@@ -875,9 +875,9 @@ uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
 version = "0.0.4"
 
 [[HypertextLiteral]]
-git-tree-sha1 = "5efcf53d798efede8fee5b2c8b09284be359bf24"
+git-tree-sha1 = "2b078b5a615c6c0396c77810d92ee8c6f470d238"
 uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.2"
+version = "0.9.3"
 
 [[IOCapture]]
 deps = ["Logging", "Random"]
@@ -1589,7 +1589,7 @@ version = "0.9.1+5"
 # ╠═cbeb9ffc-3267-4d0b-a395-f10844d60dad
 # ╠═608a4850-f7e8-11ea-2fca-af35a2f0456b
 # ╟─4099e950-fb77-11ea-23b7-6d1f7b47c07e
-# ╠═3cafb210-f89e-11ea-0cf2-bdf819224cc9
+# ╠═7901f281-a3ff-477c-b292-6121ce12af32
 # ╠═a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
 # ╠═c447b370-f7eb-11ea-1435-bd549afa0181
 # ╟─707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
