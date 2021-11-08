@@ -313,8 +313,8 @@ show_gif()
 # ╔═╡ 98502cfc-88d2-4b97-bd86-3db0e9d1ce69
 show_gif()
 
-# ╔═╡ 1a9752a0-0915-11eb-08f0-83645bd80880
-PlutoUI.TableOfContents(title="Particle Filtering")
+# ╔═╡ 5eca4aea-6c92-43bc-8aa0-ca686b168905
+TableOfContents(title="Particle Filtering")
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1318,6 +1318,6 @@ version = "0.9.1+5"
 # ╠═98502cfc-88d2-4b97-bd86-3db0e9d1ce69
 # ╠═71771e20-fc95-11ea-172c-3fa41cc22792
 # ╠═986d388f-cfcc-4299-a8e9-1d58cf2b1d8d
-# ╠═1a9752a0-0915-11eb-08f0-83645bd80880
+# ╠═5eca4aea-6c92-43bc-8aa0-ca686b168905
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
