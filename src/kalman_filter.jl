@@ -152,17 +152,15 @@ begin
 	global 𝒜 = MvNormal([0, 0], [0.25 0; 0 0.25])
 	global 𝒪 = MvNormal([0, 0], [1 0; 0 1])
 	
-	global transition = (s,a) -> clamp.(s .+ a, 𝒮ₘᵢₙ, 𝒮ₘₐₓ) # deterministic next state
-	global observation = (s′,a) -> MvNormal(𝒪.μ + s′, 𝒪.Σ*abs.(a)) # obs. distribution
+	global T = (s,a) -> [clamp.(s .+ a, 𝒮ₘᵢₙ, 𝒮ₘₐₓ)] # deterministic transition
+	global O = (s′,a) -> MvNormal(𝒪.μ + s′, 𝒪.Σ*abs.(a)) # observation distribution
 end;
 
 # ╔═╡ 4099e950-fb77-11ea-23b7-6d1f7b47c07e
 md"# Simulation and testing"
 
 # ╔═╡ 707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
-md"""
-$(@bind t Slider(0:100, show_value=true, default=10))
-"""
+@bind t Slider(0:100, show_value=true, default=10)
 
 # ╔═╡ de37b64a-1e98-416f-99b6-6c746307df93
 md"""
@@ -422,8 +420,8 @@ end
 # ╔═╡ a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
 function step(belief, 𝒫, s, a, o)
     a = rand(𝒜)
-	s′ = transition(s, a)
-	o = rand(observation(s′, a))
+	s′ = rand(T(s, a))
+	o = rand(O(s′, a))
     update!(belief, 𝒫, a, o)
     return (belief, s′, a, o)
 end
@@ -1592,7 +1590,7 @@ version = "0.9.1+5"
 # ╠═7901f281-a3ff-477c-b292-6121ce12af32
 # ╠═a89bbc40-fb77-11ea-3a1b-7197afa0c9b0
 # ╠═c447b370-f7eb-11ea-1435-bd549afa0181
-# ╟─707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
+# ╠═707e9b30-f8a1-11ea-0a6c-ad6756d07bbc
 # ╠═c9da23b2-fc49-11ea-16c5-776389af4472
 # ╟─de37b64a-1e98-416f-99b6-6c746307df93
 # ╠═83560088-c06d-4f9d-976e-63732ba206e6

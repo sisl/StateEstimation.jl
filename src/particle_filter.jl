@@ -186,10 +186,10 @@ with_terminal() do
 end
 
 # ╔═╡ 95351bbf-2034-45cc-8ded-710ca4bd921f
-belief # collection of states (our belief)
+𝐛 = rand(𝒮, m) # collection of states (our belief)
 
 # ╔═╡ a014cf69-d2de-4bec-a570-af0e39cb4404
-𝐬′ = rand.(T.(belief, a)) # sampled next states, given belief and action
+𝐬′ = rand.(T.(𝐛, a)) # sampled next states, given belief and action
 
 # ╔═╡ fc02b46c-145d-40d7-9aaf-89e2cf33cec3
 𝐰 = O.(a, 𝐬′, o) # calculated weights based on the observation model (length m)
