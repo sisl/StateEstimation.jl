@@ -68,5 +68,15 @@ Slides generated using [julia-tufte-beamer](https://github.com/mossr/julia-tufte
 </kbd>
 </p>
 
+And the MDP to POMDP slides are located here: [**MDPs to POMDPs.pptx**](slides/MDPs%20to%20POMDPs.pptx)
+
+<p align="center">
+<kbd>
+  <a href="slides/MDPs%20to%20POMDPs.pptx">
+    <img src="./slides/mdps-to-pomdps-slide.png">
+  </a>
+</kbd>
+</p>
+
 ---
 Written by [Robert Moss](https://github.com/mossr).
