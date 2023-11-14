@@ -46,10 +46,6 @@ For code, see <a href='https://github.com/mossr/StateEstimation.jl'>StateEstimat
 # ╔═╡ 929c01f6-8796-4710-a4fe-b10a0799de2b
 md"""
 # Algorithm
-"""
-
-# ╔═╡ 578ce19c-f3d1-4e45-8340-8d8c9580a20a
-md"""
 >  $\textbf{function } \text{ParticleFilter}(\mathbf{s}, T, O, a, o)$\
 > $\qquad \mathbf{s}^\prime \sim T(\mathbf{s}, a)\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\text{(next states)}$\
 > $\qquad \mathbf{w} \leftarrow O(o \mid \mathbf{s}^\prime, a)\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\qquad\quad\;\,\,\text{(weights)}$\
@@ -58,7 +54,7 @@ md"""
 
 
 - **Input**:
-    - collection of states $\mathbf{s}$ (i.e., our _belief_)
+    - collection of states $\mathbf{s}$ (i.e., our _belief_ $b$)
     - transition model $T$
     - observation model $O$
     - current action $a$
@@ -1546,7 +1542,6 @@ version = "1.4.1+1"
 # ╠═de842650-f7e7-11ea-3f11-5b92ea413bb5
 # ╠═b16208c0-03ca-4ed0-a10b-42f819cc579e
 # ╟─929c01f6-8796-4710-a4fe-b10a0799de2b
-# ╟─578ce19c-f3d1-4e45-8340-8d8c9580a20a
 # ╟─6a614491-906c-481f-b2a3-5f891b0c7aac
 # ╟─7493f9e8-3252-4163-9568-5e5dd7d68fa1
 # ╠═1a06d470-f7e8-11ea-3640-c3964cba9e1f
