@@ -31,7 +31,7 @@ using Test
 
 # ╔═╡ 2cbec03e-fb77-11ea-09a2-634fac25a12a
 html"<h1>Kalman filter</h1>
-For code, see <a href='https://github.com/mossr/StateEstimation.jl'>StateEstimation.jl</a>:
+For code, see <a href='https://github.com/sisl/StateEstimation.jl'>StateEstimation.jl</a>:
 <button onclick='present()' style='
 	# margin: auto;
 	# display: block;

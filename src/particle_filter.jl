@@ -31,7 +31,7 @@ using Test
 
 # ╔═╡ d84857b6-6831-4807-bd8b-bee90e540bcc
 html"<h1>Particle filter</h1>
-For code, see <a href='https://github.com/mossr/StateEstimation.jl'>StateEstimation.jl</a>:
+For code, see <a href='https://github.com/sisl/StateEstimation.jl'>StateEstimation.jl</a>:
 <button onclick='present()' style='
 	# margin: auto;
 	# display: block;

@@ -12,7 +12,7 @@ using PlutoUI
 
 # ╔═╡ 3e8bd204-c86b-4f9b-8e0d-4ca8526fd80c
 html"<h1>Crying baby POMDP</h1>
-For code, see <a href='https://github.com/mossr/StateEstimation.jl'>StateEstimation.jl</a>:
+For code, see <a href='https://github.com/sisl/StateEstimation.jl'>StateEstimation.jl</a>:
 <button onclick='present()' style='
 	# margin: auto;
 	# display: block;
